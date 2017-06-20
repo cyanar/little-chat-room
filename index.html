@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<meta charset=utf-8>
+<head>
+<title>聊天室</title>
+<style>
+ *{
+    margin:0;
+    padding:0;
+    font-family: "microsoft yahei";
+ }
+ .box{
+    margin: 20px auto;
+    width: 800px;
+    height: 500px;
+    padding:20px;
+    box-sizing:border-box;
+    border:1px solid #000;
+ }
+ h1{
+    text-align:center;
+ }
+ div#chat{
+     width: 750px;
+     height: 300px;
+     padding:5px;
+     margin:20px 0;
+     border: 1px solid #bbb;
+     overflow:scroll;
+     color:red;
+ }
+ .msg {
+    width: 600px;
+    height: 25px;
+ }
+ .btn,.btn2 {
+    border:none;
+    width: 80px;
+    height: 30px;
+    border-radius:3px;
+    cursor:pointer;
+    background:#4c8cf5;
+    color:#fff;
+ }
+ .btn2{
+    float:right;
+    background:#de5145;
+ }
+  .btn2:hover{
+    background:#cd3225;
+  }
+ .btn:hover{
+     background: #8ab4f9;
+ }
+ .name{
+    background:#5cb85c;
+    color:#fff;
+    border-radius:3px;
+    padding:3px;
+    font-size: 15px;
+  }
+  .time {
+     background:#ccc;
+     border-radius:3px;
+     font-size: 12px;
+     color:#fff;
+  }
+ input{
+     margin:0 10px;
+ }
+</style>
+
+</head>
+<body>
+    <div class="box">
+           <h1>chatroom</h1>
+
+           <p><span class="name">昵称:</span><input id="txtname" type="text" maxlength="15" />
+           <input id="clear" class="btn2" type="button" value="清屏"/></p>
+           <div id="chat"></div>
+           <input id="txtmsg" class="msg" type="text" name="msg" />
+           <input id="btn" class="btn" type="button" value="发送"/>
+    </div>
+</body>
+<script src="jquery-1.12.4.js"></script>
+<script type="text/javascript">
+
+var t = setInterval(get_chat_msg,1000);
+// 获取会话信息
+function get_chat_msg()
+{
+  $.get("chat_recv.php",function(data){
+        $("#chat").html("");
+        var obj = eval("("+data+")");
+        var array = obj.result;
+        for(var i=0;i<array.length;i++){
+             var obj2 = eval("("+array[i]+")");
+             var time = "<span class = time>"+obj2.chatdate+"</span>";
+             $("#chat").append($("<p>"+time+" "+obj2.username+":"+obj2.msg+"</p>"))
+        }
+  })
+};
+
+$("#btn").bind("click",function(){
+    set_chat_msg();
+});
+
+$("#txtmsg").keydown(function(event){
+  if(event.keyCode == 13){
+    set_chat_msg();
+  }
+});
+// 发送信息给数据库
+function set_chat_msg()
+ {
+    var url = "chat_send.php";
+    if($("#txtname").val()=="" || $("#txtmsg").val() == ""){
+         alert("昵称及发送内容不能为空");
+    }
+    if ($("#txtname").val()!= "")
+    {
+        strname = $("#txtname").val();
+        document.getElementById("txtname").readOnly=true;
+        strmsg = $("#txtmsg").val();
+        $.get(url,{
+            "name":strname,
+            "msg":strmsg
+        },function(msg){
+           if($.trim(msg) == "1"){$("#txtmsg").val("")};
+        });
+    }
+}
+// 清空数据库信息
+ $("#clear").click(function(){
+     $.get("delete.php",function(msg){
+     });
+ });
+
+</script>
+</html>
