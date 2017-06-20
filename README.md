@@ -3,7 +3,7 @@
 
  ``数据库结构：``
  <br>
-    ``` SQL
+    ```sql
       CREATE TABLE IF NOT EXISTS `chat` (
           `id` bigint(20) NOT NULL AUTO_INCREMENT,
           `username` varchar(20) DEFAULT NULL,
